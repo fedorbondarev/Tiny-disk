@@ -1,0 +1,11 @@
+target
+*.iml
+/.idea
+.metals/
+.vscode/
+.history/
+.bloop/
+metals.sbt
+.DS_Store
+.bsp/
+filestorage

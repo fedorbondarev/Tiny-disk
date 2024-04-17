@@ -1,0 +1,9 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <include file="texts/create-texts.sql" relativeToChangelogFile="true"/>
+    <include file="files-metadata/create-files-metadata.sql" relativeToChangelogFile="true"/>
+    <include file="public-tokens/create-text-public-tokens.sql" relativeToChangelogFile="true"/>
+    <include file="public-tokens/create-file-public-tokens.sql" relativeToChangelogFile="true"/>
+</databaseChangeLog>
