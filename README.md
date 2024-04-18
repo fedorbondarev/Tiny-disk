@@ -1,6 +1,6 @@
-# t-disk
+# T-disk
 
-t-disk is a resource storage service designed to efficiently manage file and text uploads and storage. It is built in
+T-disk is a resource storage service designed to efficiently manage file and text uploads and storage. It is built in
 Scala leveraging the functional programming capabilities provided by Cats-Effect, the expressive HTTP endpoint
 definitions of Tapir, and the database access with Doobie.
 
@@ -29,7 +29,7 @@ definitions of Tapir, and the database access with Doobie.
    ```
 2. Set Up Database:
     - Install PostgreSQL.
-    - Create a new database for t-disk.
+    - Create a new database for T-disk.
     - Configure the database connection in application.conf.
 
 3. Build and Run:
