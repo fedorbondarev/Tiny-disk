@@ -16,7 +16,7 @@ lazy val rootProject = (project in file(".")).settings(
     "com.softwaremill.sttp.tapir" %% "tapir-json-tethys" % tapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-derevo" % tapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion,
-    "ch.qos.logback" % "logback-classic" % "1.5.2",
+    "ch.qos.logback" % "logback-classic" % "1.5.6",
 
     // Tethys
     "com.tethys-json" %% "tethys" % "0.26.0",
