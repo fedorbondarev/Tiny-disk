@@ -8,6 +8,7 @@ import com.tdisk.controller.PublicSavesServerEndpoints
 import com.tdisk.database.DbModule
 import com.tdisk.services.filestorage.FileStorageImpl
 import com.tdisk.services.publicfile.PublicFileServiceImpl
+import com.tdisk.services.publictext.PublicTextServiceImpl
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router
 import pureconfig.ConfigSource
@@ -26,9 +27,11 @@ object Main extends IOApp {
 
       fileStorage = FileStorageImpl[App](fileStorageConf)
       dbModule <- DbModule.init[Init, App](conf.at("db").loadOrThrow[DbConf])
-      publicFileService = new PublicFileServiceImpl[App](fileStorage, dbModule.transactor)
 
-      apiEndpoints      = new PublicSavesServerEndpoints[App](publicFileService).all
+      publicFileService = new PublicFileServiceImpl[App](fileStorage, dbModule.transactor)
+      publicTextService = new PublicTextServiceImpl[App](dbModule.transactor)
+
+      apiEndpoints = new PublicSavesServerEndpoints[App](publicFileService, publicTextService).all
       routes = Http4sServerInterpreter[IO]().toRoutes(
         apiEndpoints ++
           SwaggerInterpreter().fromServerEndpoints[IO](apiEndpoints, "t-disk", "1.0.0")

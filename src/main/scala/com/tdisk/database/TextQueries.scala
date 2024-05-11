@@ -10,9 +10,9 @@ object TextQueries {
       .query[Text]
       .option
 
-  def save(text: Text): ConnectionIO[(TextId, Text)] =
+  def save(text: Text): ConnectionIO[TextId] =
     sql"insert into texts (text) values (${text.text})"
       .update
-      .withUniqueGeneratedKeys[(Long, String)]("id", "text")
-      .map { case (id, text) => (TextId(id), Text(text)) }
+      .withUniqueGeneratedKeys[Long]("id")
+      .map(TextId(_))
 }

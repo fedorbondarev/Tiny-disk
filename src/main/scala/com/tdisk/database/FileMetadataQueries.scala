@@ -14,6 +14,6 @@ object FileMetadataQueries {
   def save(name: String): ConnectionIO[(FileMetadataId, FileMetadata)] =
     sql"insert into files_metadata (name) values ($name)"
       .update
-      .withUniqueGeneratedKeys[(Long, String)]("id", "unique_name")
-      .map { case (id, uniqueName) => (FileMetadataId(id), FileMetadata(name, uniqueName)) }
+      .withUniqueGeneratedKeys[(FileMetadataId, String)]("id", "unique_name")
+      .map { case (fileMetadataId, uniqueName) => (fileMetadataId, FileMetadata(name, uniqueName)) }
 }

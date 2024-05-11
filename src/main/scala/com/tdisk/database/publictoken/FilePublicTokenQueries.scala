@@ -1,4 +1,4 @@
-package com.tdisk.database
+package com.tdisk.database.publictoken
 
 import com.tdisk.model.file.FileMetadataId
 import com.tdisk.model.publictoken.{ContentPublicToken, FilePublicToken, PublicToken, PublicTokenId}
@@ -15,8 +15,8 @@ object FilePublicTokenQueries {
   def save(fileMetadataId: FileMetadataId): ConnectionIO[(PublicTokenId, FilePublicToken)] =
     sql"insert into file_public_tokens (file_metadata_id) values (${fileMetadataId.id})"
       .update
-      .withUniqueGeneratedKeys[(Long, PublicToken)]("id", "token")
-      .map { case (id, token) => (PublicTokenId(id), ContentPublicToken[FileMetadataId](token, fileMetadataId)) }
+      .withUniqueGeneratedKeys[(PublicTokenId, PublicToken)]("id", "token")
+      .map { case (publicTokenId, token) => (publicTokenId, ContentPublicToken[FileMetadataId](token, fileMetadataId)) }
 
   def getFileIdByToken(token: PublicToken): ConnectionIO[Option[FileMetadataId]] =
     sql"select file_metadata_id from file_public_tokens where token = ${token.token}"

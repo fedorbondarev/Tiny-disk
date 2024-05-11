@@ -7,8 +7,8 @@ import com.tdisk.database.DbModule
 import doobie.FC
 import doobie.implicits.toConnectionIOOps
 import liquibase.command.CommandScope
-import liquibase.command.core.helpers.DbUrlConnectionArgumentsCommandStep
 import liquibase.command.core.{ClearChecksumsCommandStep, UpdateCommandStep}
+import liquibase.command.core.helpers.DbUrlConnectionArgumentsCommandStep
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import pureconfig.ConfigSource
@@ -19,14 +19,16 @@ object LiquibaseMigration extends IOApp {
       _ <- Console[IO].println("Starting liquibase migration...")
 
       dbConf        = ConfigSource.default.at("db").loadOrThrow[DbConf]
-      changeLogFile = "changelog.xml"
+      changeLogFile = "migrations/changelog.xml"
 
       dbModule <- DbModule.init[IO, IO](dbConf)
 
       _ <- FC.raw { conn =>
         val database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(conn))
-
-        val commands = List(new CommandScope(UpdateCommandStep.COMMAND_NAME: _*))
+        val commands = List(
+          new CommandScope(ClearChecksumsCommandStep.COMMAND_NAME: _*),
+          new CommandScope(UpdateCommandStep.COMMAND_NAME: _*)
+        )
 
         commands.foreach(
           _

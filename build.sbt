@@ -1,8 +1,9 @@
-val tapirVersion  = "1.10.4"
-val tethysVersion = "0.26.0"
-val doobieVersion = "1.0.0-RC2"
-val tofuVersion   = "0.12.1"
-val derevoVersion = "0.13.0"
+val tapirVersion   = "1.10.4"
+val tethysVersion  = "0.26.0"
+val doobieVersion  = "1.0.0-RC2"
+val tofuVersion    = "0.12.1"
+val derevoVersion  = "0.13.0"
+val refinedVersion = "0.11.1"
 
 lazy val rootProject = (project in file(".")).settings(
   name         := "t-disk",
@@ -15,7 +16,8 @@ lazy val rootProject = (project in file(".")).settings(
     "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-json-tethys" % tapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-derevo" % tapirVersion,
-    "com.softwaremill.sttp.tapir" %% "tapir-cats" % tapirVersion,
+    "com.softwaremill.sttp.tapir" %% "tapir-cats" % "1.10.6",
+    "com.softwaremill.sttp.tapir" %% "tapir-cats-effect" % tapirVersion,
     "ch.qos.logback" % "logback-classic" % "1.5.6",
 
     // Tethys
@@ -48,7 +50,7 @@ lazy val rootProject = (project in file(".")).settings(
     "org.http4s" %% "http4s-ember-server" % "0.23.24",
 
     // Test
-    "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Test,
+    "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % "1.10.6" % Test,
     "org.scalatest" %% "scalatest" % "3.2.18" % Test,
 
     // Pureconfig
