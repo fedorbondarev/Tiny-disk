@@ -15,7 +15,7 @@ import doobie.Transactor
 import doobie.implicits.{toConnectionIOOps, toOptionTConnectionIOOps}
 import tofu.syntax.feither.EitherFOps
 
-import java.io.InputStream
+import fs2.Stream
 
 class PublicFileServiceImpl[F[_]: Random: Concurrent](
   val fileStorage: FileStorage[F],
@@ -23,7 +23,7 @@ class PublicFileServiceImpl[F[_]: Random: Concurrent](
 ) extends PublicFileService[F] {
   @inline private def genUniqueFileName: F[String] = Random[F].nextBytes(32).map(_.map("%02x".format(_)).mkString)
 
-  override def save(fileData: FileData): F[Either[ApiError, PublicToken]] =
+  override def save(fileData: FileData[F]): F[Either[ApiError, PublicToken]] =
     (for {
       uniqueName <- genUniqueFileName
       (token, savingFileRes) <- Concurrent[F].both(
@@ -38,7 +38,7 @@ class PublicFileServiceImpl[F[_]: Random: Concurrent](
       .attempt
       .leftMapIn(e => ServerApiError(e.getMessage))
 
-  override def get(token: publictoken.PublicToken): F[Either[ApiError, (InputStream, String)]] =
+  override def get(token: publictoken.PublicToken): F[Either[ApiError, (Stream[F, Byte], String)]] =
     (for {
       fileMetadata <-
         (for {
@@ -50,6 +50,5 @@ class PublicFileServiceImpl[F[_]: Random: Concurrent](
       data <- EitherT(fileStorage.readFile(fileMetadata.uniqueName))
         .leftMap[ApiError](e => ServerApiError(e.getMessage))
     } yield (data, fileMetadata.name))
-      .attempt
-      .fold(Left(_), identity)
+      .value
 }

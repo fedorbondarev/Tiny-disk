@@ -1,15 +1,14 @@
 package com.tdisk.controller.endpoints
 
 import com.tdisk.error.{ApiError, BusinessApiError, ServerApiError}
-import com.tdisk.model.file.FileData
 import com.tdisk.model.publictoken.PublicToken
 import com.tdisk.model.text.Text
+import fs2.Stream
+import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.HeaderNames
 import sttp.tapir._
 import sttp.tapir.codec.newtype.codecForNewType
 import sttp.tapir.json.tethysjson.jsonBody
-
-import java.io.InputStream
 
 object PublicSavesEndpoints {
   private val oneOfApiError = oneOf[ApiError](
@@ -30,18 +29,19 @@ object PublicSavesEndpoints {
       .errorOut(oneOfApiError)
       .out(plainBody[Text])
 
-  val uploadPublicFile: PublicEndpoint[FileData, ApiError, PublicToken, Any] =
+  def uploadPublicFile[F[_]]: PublicEndpoint[(Stream[F, Byte], String), ApiError, PublicToken, Fs2Streams[F]] =
     endpoint.post
       .in("uploadPublicFile")
-      .in(multipartBody[FileData])
+      .in(streamBinaryBody(Fs2Streams[F])(CodecFormat.OctetStream()))
+      .in(header[String](HeaderNames.ContentDisposition))
       .errorOut(oneOfApiError)
       .out(jsonBody[PublicToken])
 
-  val getPublicFile: PublicEndpoint[PublicToken, ApiError, (InputStream, String), Any] =
+  def getPublicFile[F[_]]: PublicEndpoint[PublicToken, ApiError, (Stream[F, Byte], String), Fs2Streams[F]] =
     endpoint.get
       .in("file" / path[PublicToken]("publicToken"))
       .errorOut(oneOfApiError)
-      .out(inputStreamBody)
+      .out(streamBinaryBody(Fs2Streams[F])(CodecFormat.OctetStream()))
       .out(header(HeaderNames.ContentType, "application/octet-stream"))
       .out(header[String](HeaderNames.ContentDisposition))
 }

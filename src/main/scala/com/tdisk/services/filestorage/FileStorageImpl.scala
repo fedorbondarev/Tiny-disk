@@ -1,31 +1,46 @@
 package com.tdisk.services.filestorage
 
-import cats.effect.kernel.Sync
+import cats.Monad
+import cats.effect.Concurrent
 import cats.implicits.{catsSyntaxApplicativeError, toFunctorOps}
 import com.tdisk.config.FileStorageConf
 import com.tdisk.error.{FileStorageError, UnexpectedFileStorageError}
+import fs2.Stream
+import fs2.io.file.{Files, Path}
+import tofu.syntax.collections.CatsTraverseSyntax
 
-import java.io.{BufferedInputStream, InputStream}
-import java.nio.file.{Files, Path}
+import java.nio.file.{Path => JPath}
 
-class FileStorageImpl[F[_]: Sync](
+class FileStorageImpl[F[_]: Monad: Files: Concurrent](
   val fileStorageConf: FileStorageConf
 ) extends FileStorage[F] {
-  def saveFile(data: InputStream, name: String): F[Either[FileStorageError, Unit]] =
-    Sync[F].blocking(
-      Files.copy(data, Path.of(fileStorageConf.pathToDirectory, name))
-    ).attempt.map {
-      case Left(e)  => Left(UnexpectedFileStorageError(e.getMessage))
-      case Right(_) => Right(())
-    }
+  @inline private def getFullPath(fileName: String): Path =
+    Path.fromNioPath(JPath.of(fileStorageConf.pathToDirectory, fileName))
 
-  def readFile(name: String): F[Either[FileStorageError, InputStream]] =
-    Sync[F].blocking(
-      new BufferedInputStream(Files.newInputStream(Path.of(fileStorageConf.pathToDirectory, name)))
-    ).attempt.map(_.left.map(e => UnexpectedFileStorageError(e.getMessage)))
+  def saveFile(data: Stream[F, Byte], name: String): F[Either[FileStorageError, Unit]] =
+    data
+      .through(
+        Files[F].writeAll(getFullPath(name))
+      )
+      .compile
+      .drain
+      .attempt.map(_.left.map(e =>
+        UnexpectedFileStorageError(e.getMessage)
+      ))
+
+  def readFile(name: String): F[Either[FileStorageError, Stream[F, Byte]]] =
+    Files[F].readAll(getFullPath(name))
+      .attempt
+      .map(_.left.map(e =>
+        UnexpectedFileStorageError(e.getMessage)
+      ))
+      .compile
+      .toList
+      .map(_.traverse(identity))
+      .map(_.map(Stream.emits[F, Byte](_)))
 }
 
 object FileStorageImpl {
-  def apply[F[_]: Sync](fileStorageConf: FileStorageConf): FileStorage[F] =
+  def apply[F[_]: Files: Concurrent](fileStorageConf: FileStorageConf): FileStorage[F] =
     new FileStorageImpl[F](fileStorageConf)
 }

@@ -1,14 +1,8 @@
 package com.tdisk.model.file
 
-import derevo.derive
-import sttp.tapir.Schema.annotations.validate
-import sttp.tapir.Validator
-import sttp.tapir.derevo.schema
+import fs2.Stream
 
-import java.io.InputStream
-
-@derive(schema)
-case class FileData(
-  @validate(Validator.nonEmptyString) name: String,
-  data: InputStream
+case class FileData[F[_]](
+  name: String,
+  data: Stream[F, Byte]
 )
