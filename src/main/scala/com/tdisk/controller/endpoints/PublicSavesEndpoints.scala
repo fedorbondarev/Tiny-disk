@@ -5,7 +5,6 @@ import com.tdisk.model.file.FileData
 import com.tdisk.model.publictoken.PublicToken
 import com.tdisk.model.text.Text
 import sttp.model.HeaderNames
-import sttp.tapir.Codec.string
 import sttp.tapir._
 import sttp.tapir.codec.newtype.codecForNewType
 import sttp.tapir.json.tethysjson.jsonBody
