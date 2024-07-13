@@ -1,15 +1,13 @@
 package com.tdisk.controller
 
-import cats.effect.kernel.Sync
-import cats.effect.std.Console
-import cats.implicits.catsSyntaxApplicativeId
+import cats.Functor
+import cats.implicits.toFunctorOps
 import com.tdisk.controller.endpoints.PublicSavesEndpoints
-import com.tdisk.model.publictoken.PublicToken
 import com.tdisk.services.publicfile.PublicFileService
 import com.tdisk.services.publictext.PublicTextService
 import sttp.tapir.server.ServerEndpoint
 
-final class PublicSavesServerEndpoints[F[_]: Sync: Console](
+final class PublicSavesServerEndpoints[F[_]: Functor](
   publicFileService: PublicFileService[F],
   publicTextService: PublicTextService[F]
 ) {
@@ -29,8 +27,10 @@ final class PublicSavesServerEndpoints[F[_]: Sync: Console](
     )
 
   private val getPublicFileServerEndpoint: ServerEndpoint[Any, F] =
-    PublicSavesEndpoints.getPublicFile.serverLogic(
-      publicFileService.get
+    PublicSavesEndpoints.getPublicFile.serverLogic(token =>
+      publicFileService.get(token).map(_.map {
+        case (data, name) => (data, s"attachment; filename=\"$name\"")
+      })
     )
 
   val all: List[ServerEndpoint[Any, F]] =

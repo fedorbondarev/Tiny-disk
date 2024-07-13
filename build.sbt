@@ -62,7 +62,15 @@ lazy val rootProject = (project in file(".")).settings(
     // Liquibase
     "org.liquibase" % "liquibase-core" % "4.27.0"
   ),
-  scalacOptions += "-Ymacro-annotations",
+  scalacOptions ++= Seq(
+    "-Ymacro-annotations",
+    "-feature",
+    "-Werror",
+    "-language:implicitConversions",
+    "-Xlint",
+    "-Xlint:-byname-implicit",
+    "-Xlint:-implicit-recursion"
+  ),
   addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full),
   addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
 )

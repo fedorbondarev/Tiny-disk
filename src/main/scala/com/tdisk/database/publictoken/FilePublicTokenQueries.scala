@@ -4,7 +4,6 @@ import com.tdisk.model.file.FileMetadataId
 import com.tdisk.model.publictoken.{ContentPublicToken, FilePublicToken, PublicToken, PublicTokenId}
 import doobie.ConnectionIO
 import doobie.implicits.toSqlInterpolator
-import sttp.tapir.codec.newtype._
 
 object FilePublicTokenQueries {
   def get(id: PublicTokenId): ConnectionIO[Option[FilePublicToken]] =

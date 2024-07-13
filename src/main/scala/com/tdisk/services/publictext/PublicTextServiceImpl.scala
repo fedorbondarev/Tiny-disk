@@ -1,14 +1,14 @@
 package com.tdisk.services.publictext
 import cats.data.OptionT
 import cats.effect.kernel.MonadCancelThrow
-import cats.implicits.{catsSyntaxApplicativeError, toFlatMapOps, toFunctorOps}
+import cats.implicits.toFunctorOps
 import com.tdisk.database.TextQueries
 import com.tdisk.database.publictoken.TextPublicTokenQueries
 import com.tdisk.error.{ApiError, BusinessApiError}
 import com.tdisk.model.publictoken.{ContentPublicToken, PublicToken}
 import com.tdisk.model.text.Text
-import doobie.implicits.{toConnectionIOOps, toOptionTConnectionIOOps}
 import doobie.Transactor
+import doobie.implicits.{toConnectionIOOps, toOptionTConnectionIOOps}
 
 class PublicTextServiceImpl[F[_]: MonadCancelThrow](
   transactor: Transactor[F]

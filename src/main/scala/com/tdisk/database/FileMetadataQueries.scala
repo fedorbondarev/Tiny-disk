@@ -1,7 +1,6 @@
 package com.tdisk.database
 
 import com.tdisk.model.file.{FileMetadata, FileMetadataId}
-import com.tdisk.model.text.TextId
 import doobie.ConnectionIO
 import doobie.implicits.toSqlInterpolator
 
@@ -16,4 +15,9 @@ object FileMetadataQueries {
       .update
       .withUniqueGeneratedKeys[(FileMetadataId, String)]("id", "unique_name")
       .map { case (fileMetadataId, uniqueName) => (fileMetadataId, FileMetadata(name, uniqueName)) }
+
+  def save(name: String, uniqueName: String): ConnectionIO[FileMetadataId] =
+    sql"insert into files_metadata (name, unique_name) values ($name, $uniqueName)"
+      .update
+      .withUniqueGeneratedKeys[FileMetadataId]("id")
 }
