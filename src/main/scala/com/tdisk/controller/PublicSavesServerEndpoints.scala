@@ -3,8 +3,9 @@ package com.tdisk.controller
 import cats.Applicative
 import cats.implicits.{catsSyntaxApplicativeId, toFunctorOps}
 import com.tdisk.controller.endpoints.PublicSavesEndpoints
-import com.tdisk.error.ServerApiError
+import com.tdisk.error.{ApiError, ServerApiError}
 import com.tdisk.model.file.FileData
+import com.tdisk.model.publictoken.PublicToken
 import com.tdisk.services.publicfile.PublicFileService
 import com.tdisk.services.publictext.PublicTextService
 import sttp.capabilities.fs2.Fs2Streams
@@ -24,13 +25,17 @@ final class PublicSavesServerEndpoints[F[_]: Applicative](
       publicTextService.get
     )
 
-  private val uploadPublicFileServerEndpoint: ServerEndpoint[Fs2Streams[F], F] =
+  private val uploadPublicFileServerEndpoint: ServerEndpoint[Fs2Streams[F], F] = {
+    val filenamePattern = ".*filename\\*?=\"(.+)\".*".r
     PublicSavesEndpoints.uploadPublicFile.serverLogic {
-      case (data, s"attachment; filename=\"$filename\"") =>
+      case (data, filenamePattern(filename)) =>
         publicFileService.save(FileData(filename, data))
       case _ =>
-        Left(ServerApiError("File data or headers has invalid type")).pure[F].map(identity)
+        (
+          Left(ServerApiError("File data or headers has invalid type")): Either[ApiError, PublicToken]
+        ).pure[F]
     }
+  }
 
   private val getPublicFileServerEndpoint: ServerEndpoint[Fs2Streams[F], F] =
     PublicSavesEndpoints.getPublicFile.serverLogic(token =>
