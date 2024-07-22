@@ -1,6 +1,6 @@
-# T-disk
+# Tiny-disk
 
-T-disk is a resource storage service designed to efficiently manage file and text uploads and storage. It is built in
+Tiny-disk is a resource storage service designed to efficiently manage file and text uploads and storage. It is built in
 Scala leveraging the functional programming capabilities provided by Cats-Effect, the expressive HTTP endpoint
 definitions of Tapir, and the database access with Doobie.
 
@@ -24,12 +24,12 @@ definitions of Tapir, and the database access with Doobie.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/fedorbondarev/t-disk.git
-   cd t-disk
+   git clone https://github.com/fedorbondarev/tiny-disk.git
+   cd tiny-disk
    ```
 2. Set Up Database:
     - Install PostgreSQL.
-    - Create a new database for T-disk.
+    - Create a new database for Tiny-disk.
     - Configure the database connection in application.conf.
 
 3. Build and Run:
